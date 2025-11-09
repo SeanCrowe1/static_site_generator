@@ -45,3 +45,23 @@ class LeafNode(HTMLNode):
             attrs = "".join(f' {k}="{v}"' for k, v in self.props.items())
         
         return f'<{self.tag}{attrs}>{self.value}</{self.tag}>'
+    
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag=tag, value=None, children=children, props=props)
+
+    def to_html(self):
+        if self.tag == None:
+            raise(ValueError("missing tag"))
+        if not self.children:
+            raise(ValueError("missing children"))
+        
+        attrs = ""
+        if self.props:
+            attrs = "".join(f' {k}="{v}"' for k, v in self.props.items())
+
+        final = f"<{self.tag}{attrs}>"
+        for child in self.children:
+            final += child.to_html()
+        final += f'</{self.tag}>'
+        return final

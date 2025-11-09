@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -31,6 +31,61 @@ class TestHTMLNode(unittest.TestCase):
     def test_leaf_with_props(self):
         node = LeafNode("p", "Hey, guys", {"href": "https://www.google.com"})
         self.assertEqual(node.to_html(), '<p href="https://www.google.com">Hey, guys</p>')
+
+    def test_parent_to_html_p(self):
+        node = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text")
+            ],
+        )
+
+        self.assertEqual(node.to_html(), "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
+
+    def test_parent_with_props(self):
+        node = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text")
+            ],
+            {
+                "href": "https://www.google.com",
+                "target": "_blank"
+            },
+        )
+
+        self.assertEqual(node.to_html(), '<p href="https://www.google.com" target="_blank"><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>')
+
+    def test_parent_with_parents(self):
+        node = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text")
+            ],
+            {
+                "href": "https://www.google.com",
+                "target": "_blank"
+            },
+        )
+
+        node2 = ParentNode(
+            "c",
+            [
+                node,
+                LeafNode("p", "This is a middle child")
+            ],
+        )
+
+        self.assertEqual(node2.to_html(), '<c><p href="https://www.google.com" target="_blank"><b>Bold text</b>Normal text<i>italic text</i>Normal text</p><p>This is a middle child</p></c>')
 
 
 if __name__ == "__main__":
